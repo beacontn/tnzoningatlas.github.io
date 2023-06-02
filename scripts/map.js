@@ -10,6 +10,7 @@ var zone2color = {
   'M': '#815196', // mixed with residential, satisfied
   'N': '#BA6CA4', // nonresidential, satisfied
   'NS': '#d0d0d0', // not satisfied
+  null: '#d0d0d0'
 }
 
 // Columns in the original spreadsheet
@@ -38,11 +39,12 @@ var updateUrl = function() {
  * Loads the main GeoJSON data file
  */
 var loadZones = function(geojson) {
+
   var filters = getFilters();
 
   dataLayer = L.geoJSON(geojson, {
-    attribution: 'data by <a href="https://www.beacontn.org/">Beacon Center of Tennessee</a>,\
-      map development by <a href="https://www.beacontn.org/">Beacon Center of Tennessee</a>',
+    attribution: 'data by <a href="https://www.desegregatect.org/">Desegregate CT</a>,\
+      map development by <a href="https://ctdata.org">CTData Collaborative</a>',
     style: function(feature) { return style(filters, feature) },
     onEachFeature: function(feature, layer) {
 
@@ -80,7 +82,7 @@ var loadZones = function(geojson) {
 
       // Add tooltip
       layer.bindTooltip(!pp[zName] || pp[zName] === 'Not Zoned' || pp[zName] === 'NULL'
-        ? '<strong>Not Zoned</strong><br>' + pp[zTown]
+        ? (pp[zName] === 'Not Zoned' ? '<strong>Not Zoned</strong><br>' + pp[zTown] : '<strong>Unknown</strong><br>' + pp[zTown])
         : '<h6 class="t-t ttu">' + pp[zName] + '</h6><strong class="black-50">' + pp[zTown] + '</strong><br>'
         + (pp['AHD'] == 'Yes' ? 'Affordable  Housing Only<br>' : '')
         + (pp['EHD'] == 'Yes' ? 'Elderly Housing Only<br>' : '')
@@ -236,7 +238,6 @@ var getFilters = function() {
  * checkboxes are satisfied by the `feature` (zone), `false` otherwise.
  */
 var satisfiesFilters = function(filters, feature) {
-
   for (var name in filters) {
     if (name === 'Overlay') continue;
 
